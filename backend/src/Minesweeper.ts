@@ -13,6 +13,7 @@ export class MinesweeperGame {
     height: number
     mineCount: number
     hintsUsed: number = 0;
+    startTime: number = 0;
 
     constructor(width: number, height: number, mineCount: number) {
         this.width = width;
@@ -99,6 +100,8 @@ export class MinesweeperGame {
         const cell = this.board[this.idx(x, y)];
         if (cell.revealed || cell.flagged) return;
 
+        this.startTimer();
+
         const stack: [number, number][] = [[x, y]];
         const visited = new Set<string>();
 
@@ -126,7 +129,9 @@ export class MinesweeperGame {
     flagCell(x: number, y: number, playerId: string): void {
         if (x < 0 || y < 0 || x >= this.width || y >= this.height) return;
         const cell = this.board[this.idx(x, y)];
-        if (cell.revealed) return;
+        if (cell.revealed || cell.isStartingCell) return;
+
+        this.startTimer();
 
         if (cell.flagged) {
             cell.flagged = false;
@@ -142,9 +147,7 @@ export class MinesweeperGame {
     useHint(x: number, y: number, playerId: string): void {
         if (x < 0 || y < 0 || x >= this.width || y >= this.height) return;
         const cell = this.board[this.idx(x, y)];
-        if (cell.flagged || cell.revealed) {
-            return;
-        }
+        if (cell.flagged || cell.revealed || cell.isStartingCell) return;
 
         if (cell.value === -1) {
             this.flagCell(x, y, playerId);
@@ -152,6 +155,10 @@ export class MinesweeperGame {
             this.revealCell(x, y, playerId);
         }
         this.hintsUsed++;
+    }
+
+    startTimer(): void {
+        this.startTime = Date.now();
     }
 
     /*
