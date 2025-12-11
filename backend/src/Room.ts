@@ -1,18 +1,46 @@
 import { Room, Client } from "colyseus";
-import { GameState } from "./State"
+import { MinesweeperGame, GameStatus } from "./Minesweeper";
 
-export class MinesweeperRoom extends Room<GameState> {
-    private seed: number = 0;
+export class MinesweeperRoom extends Room<MinesweeperGame> {
 
     onCreate(options: any) {
-        const width = options.width ?? 10;
-        const height = options.height ?? 10;
-        const mineCount = options.mineCount ?? 10;
+        console.log("Minesweeper Room created", options);
 
-        this.setState(new GameState(width, height, mineCount));
+        // initialer Seed oder per Options
+        const seed = options.seed ?? Date.now();
+        this.state = new MinesweeperGame(options.width, options.height, options.mineCount);
+        this.state.generateBoard(seed);
 
-        this.onMessage("reveal", (client: Client, message: { x: number; y: number }) => {
-            const { x, y } = message;
-        })
+        // Nachrichten vom Client
+        this.onMessage("reveal", (client, message: { x: number, y: number }) => {
+            this.state.revealCell(message.x, message.y, client.sessionId);
+        });
+
+        this.onMessage("flag", (client, message: { x: number, y: number }) => {
+            this.state.flagCell(message.x, message.y, client.sessionId);
+        });
+
+        this.onMessage("hint", (client, message: { x: number, y: number }) => {
+            this.state.useHint(message.x, message.y, client.sessionId);
+        });
+
+        this.onMessage("newGame", (client, message: { seed?: number }) => {
+            const newSeed = message.seed ?? Date.now();
+            this.state.resetGame(newSeed);
+            this.broadcast("newGameStarted", { seed: newSeed });
+        });
+    }
+
+    onJoin(client: Client, options: any) {
+        console.log(client.sessionId, "joined the room");
+        client.send("boardState", this.state.getStateForClient());
+    }
+
+    onLeave(client: Client, consented: boolean) {
+        console.log(client.sessionId, "left the room");
+    }
+
+    onDispose() {
+        console.log("Minesweeper Room disposed");
     }
 }

@@ -18,11 +18,13 @@
     "seedrandom": "^3.0.5"
   },
   "devDependencies": {
+    "@colyseus/testing": "^0.16.3",
     "@types/jest": "^30.0.0",
     "@types/seedrandom": "^3.0.8",
     "jest": "^30.2.0",
     "ts-jest": "^29.4.6",
     "ts-node-dev": "^2.0.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "ws": "^8.18.3"
   }
 }

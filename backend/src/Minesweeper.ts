@@ -1,5 +1,6 @@
 import seedrandom from "seedrandom";
-import {CellData} from "./Types";
+import {CellData} from "./State";
+import { Schema, type, ArraySchema } from "@colyseus/schema";
 
 // @formatter:off
 const neighborPositions = [
@@ -17,25 +18,27 @@ export enum GameStatus {
     Lost
 }
 
-export class MinesweeperGame {
-    board: CellData[];
-    width: number;
-    height: number;
-    mineCount: number;
-    hintsUsed: number = 0;
-    startTime: number = 0;
-    status: GameStatus = GameStatus.NotReady;
+export class MinesweeperGame extends Schema {
+    @type([CellData]) board = new ArraySchema<CellData>();
+
+    @type("number") width = 0;
+    @type("number") height = 0;
+    @type("number") mineCount = 0;
+
+    @type("number") hintsUsed = 0;
+    @type("number") startTime = 0;
+
+    @type("number") status = GameStatus.NotReady;
 
     constructor(width: number, height: number, mineCount: number) {
+        super();
         this.width = width;
         this.height = height;
         this.mineCount = mineCount;
-        this.board = new Array(width * height).fill(null).map(() => ({
-            revealed: false,
-            flagged: false,
-            value: 0,
-            lastInteractedBy: null
-        }));
+
+        for (let i = 0; i < width * height; i++) {
+            this.board.push(new CellData());
+        }
     }
 
     public generateBoard(seed: number): void {
@@ -220,19 +223,34 @@ export class MinesweeperGame {
     }
 
     public resetGame(seed: number): void {
-        this.board = new Array(this.width * this.height).fill(null).map(() => ({
-            revealed: false,
-            flagged: false,
-            value: 0,
-            lastInteractedBy: null
-        }));
+        this.board = new ArraySchema<CellData>();
+        for (let i = 0; i < this.width * this.height; i++) {
+            this.board.push(new CellData());
+        }
         this.hintsUsed = 0;
         this.startTime = 0;
         this.status = GameStatus.NotReady;
         this.generateBoard(seed)
     }
 
-    private idx(x: number, y: number) {
+    public getStateForClient() {
+        return {
+            width: this.width,
+            height: this.height,
+            cells: this.board.map(cell => ({
+                value: cell.value,
+                revealed: cell.revealed,
+                flagged: cell.flagged,
+                lastInteractedBy: cell.lastInteractedBy,
+                isStartingCell: cell.isStartingCell ?? false
+            })),
+            status: this.status,
+            hintsUsed: this.hintsUsed,
+            startTime: this.startTime
+        };
+    }
+
+    public idx(x: number, y: number) {
         return y * this.width + x;
     }
 
