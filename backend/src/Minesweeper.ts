@@ -1,5 +1,5 @@
 import seedrandom from "seedrandom";
-import { CellData } from "./Types";
+import {CellData} from "./Types";
 
 const neighborPositions = [
     [-1, -1], [0, -1], [1, -1],
@@ -8,10 +8,11 @@ const neighborPositions = [
 ];
 
 export class MinesweeperGame {
-    board:  CellData[]
+    board: CellData[]
     width: number
     height: number
     mineCount: number
+    hintsUsed: number = 0;
 
     constructor(width: number, height: number, mineCount: number) {
         this.width = width;
@@ -39,11 +40,11 @@ export class MinesweeperGame {
                 let x = Math.floor(rng() * this.width);
                 let y = Math.floor(rng() * this.height);
 
-                if (this.board[this.idx(x,y)].value === -1) {
+                if (this.board[this.idx(x, y)].value === -1) {
                     continue;
                 }
 
-                this.board[this.idx(x,y)].value = -1;
+                this.board[this.idx(x, y)].value = -1;
                 break;
             }
         }
@@ -51,7 +52,7 @@ export class MinesweeperGame {
         // Calculate mine counts
         for (let y = 0; y < this.height; y++) {
             for (let x = 0; x < this.width; x++) {
-                if (this.board[this.idx(x,y)].value === -1) {
+                if (this.board[this.idx(x, y)].value === -1) {
                     for (const [dx, dy] of neighborPositions) {
                         const newX = x + dx;
                         const newY = y + dy;
@@ -68,7 +69,7 @@ export class MinesweeperGame {
         let startCellCandidates = []
         for (let y = 0; y < this.height; y++) {
             for (let x = 0; x < this.width; x++) {
-                if (this.board[this.idx(x,y)].value === 0) {
+                if (this.board[this.idx(x, y)].value === 0) {
                     startCellCandidates.push({x: x, y: y});
                 }
             }
@@ -81,23 +82,23 @@ export class MinesweeperGame {
                 let x = Math.floor(rng() * this.width);
                 let y = Math.floor(rng() * this.height);
 
-                if (this.board[this.idx(x,y)].value !== -1) {
-                    this.board[this.idx(x,y)].isStartingCell = true;
+                if (this.board[this.idx(x, y)].value !== -1) {
+                    this.board[this.idx(x, y)].isStartingCell = true;
                     break;
                 }
             }
         } else {
             let startCell = startCellCandidates[Math.floor(rng() * startCellCandidates.length)];
-            this.board[this.idx(startCell.x,startCell.y)].isStartingCell = true;
+            this.board[this.idx(startCell.x, startCell.y)].isStartingCell = true;
         }
     }
 
     // reveal cell. Flood fill if value is 0
-    revealCell(x: number, y: number, playerId: string ): void {
-        if(x < 0 || y < 0 || x >= this.width || y >= this.height) return;
+    revealCell(x: number, y: number, playerId: string): void {
+        if (x < 0 || y < 0 || x >= this.width || y >= this.height) return;
         const cell = this.board[this.idx(x, y)];
         if (cell.revealed || cell.flagged) return;
-        
+
         const stack: [number, number][] = [[x, y]];
         const visited = new Set<string>();
 
@@ -123,11 +124,11 @@ export class MinesweeperGame {
     }
 
     flagCell(x: number, y: number, playerId: string): void {
-        if(x < 0 || y < 0 || x >= this.width || y >= this.height) return;
+        if (x < 0 || y < 0 || x >= this.width || y >= this.height) return;
         const cell = this.board[this.idx(x, y)];
         if (cell.revealed) return;
 
-        if(cell.flagged){
+        if (cell.flagged) {
             cell.flagged = false;
             cell.lastInteractedBy = null;
             return;
@@ -139,20 +140,18 @@ export class MinesweeperGame {
     }
 
     useHint(x: number, y: number, playerId: string): void {
-        if(x < 0 || y < 0 || x >= this.width || y >= this.height) return;
+        if (x < 0 || y < 0 || x >= this.width || y >= this.height) return;
         const cell = this.board[this.idx(x, y)];
-        if(cell.flagged || cell.revealed) {
+        if (cell.flagged || cell.revealed) {
             return;
         }
 
-        if(!cell.revealed) {
-            if(cell.value !== -1) {
-                this.revealCell(x, y, playerId);
-                return;
-            } else {
-                this.flagCell(x, y, playerId);
-            }
+        if (cell.value === -1) {
+            this.flagCell(x, y, playerId);
+        } else {
+            this.revealCell(x, y, playerId);
         }
+        this.hintsUsed++;
     }
 
     /*
@@ -162,8 +161,8 @@ export class MinesweeperGame {
         let output = "";
         for (let y = 0; y < this.height; y++) {
             for (let x = 0; x < this.width; x++) {
-                const cell = this.board[this.idx(x,y)];
-                if(cell.isStartingCell) {
+                const cell = this.board[this.idx(x, y)];
+                if (cell.isStartingCell) {
                     output += "[S]";
                 } else if (cell.value === -1) {
                     output += " * ";
