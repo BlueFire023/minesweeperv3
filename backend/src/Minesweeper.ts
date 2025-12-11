@@ -38,11 +38,7 @@ export class MinesweeperGame {
         }));
     }
 
-    idx(x: number, y: number) {
-        return y * this.width + x;
-    }
-
-    generateBoard(seed: number): void {
+    public generateBoard(seed: number): void {
         const rng = seedrandom(seed.toString());
 
         if (this.mineCount > this.width * this.height) throw new Error("Too many mines");
@@ -107,7 +103,7 @@ export class MinesweeperGame {
     }
 
     // reveal cell. Flood fill if value is 0
-    revealCell(x: number, y: number, playerId: string): void {
+    public revealCell(x: number, y: number, playerId: string): void {
         if (x < 0 || y < 0 || x >= this.width || y >= this.height) return;
         const cell = this.board[this.idx(x, y)]
         if (cell.flagged) return;
@@ -155,15 +151,16 @@ export class MinesweeperGame {
                 this.handleFloodFill(x, y, playerId);
             }
         }
+        this.checkWin();
     }
 
-    handleMineHit(cell: CellData, playerId: string): void {
+    private handleMineHit(cell: CellData, playerId: string): void {
         cell.revealed = true;
         cell.lastInteractedBy = playerId;
         this.status = GameStatus.Lost;
     }
 
-    handleFloodFill(x: number, y: number, playerId: string): void {
+    private handleFloodFill(x: number, y: number, playerId: string): void {
         const stack: [number, number][] = [[x, y]];
         const visited = new Set<string>();
 
@@ -191,7 +188,7 @@ export class MinesweeperGame {
         }
     }
 
-    flagCell(x: number, y: number, playerId: string): void {
+    public flagCell(x: number, y: number, playerId: string): void {
         if (x < 0 || y < 0 || x >= this.width || y >= this.height) return;
         const cell = this.board[this.idx(x, y)];
         if (cell.revealed || cell.isStartingCell) return;
@@ -209,7 +206,7 @@ export class MinesweeperGame {
         }
     }
 
-    useHint(x: number, y: number, playerId: string): void {
+    public useHint(x: number, y: number, playerId: string): void {
         if (x < 0 || y < 0 || x >= this.width || y >= this.height) return;
         const cell = this.board[this.idx(x, y)];
         if (cell.flagged || cell.revealed || cell.isStartingCell) return;
@@ -222,7 +219,18 @@ export class MinesweeperGame {
         this.hintsUsed++;
     }
 
-    startTimer(): void {
+    private idx(x: number, y: number) {
+        return y * this.width + x;
+    }
+
+    private checkWin(): void {
+        const won = this.board.every(cell => cell.value === -1 || cell.revealed);
+        if (won) {
+            this.status = GameStatus.Won;
+        }
+    }
+
+    private startTimer(): void {
         if (this.status === GameStatus.Running) return;
         this.startTime = Date.now();
         this.status = GameStatus.Running;
@@ -231,7 +239,7 @@ export class MinesweeperGame {
     /*
      *  Debug
      */
-    getBoardString(): string {
+    public getBoardString(): string {
         let output = "";
         for (let y = 0; y < this.height; y++) {
             for (let x = 0; x < this.width; x++) {
