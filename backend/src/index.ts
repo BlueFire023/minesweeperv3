@@ -3,8 +3,16 @@ import http from "http";
 import { Server } from "colyseus";
 import { matchMaker } from "@colyseus/core";
 import { MinesweeperRoom } from "./Room";
+import cors from "cors"
 
 const app = express();
+
+app.use(cors({
+    origin: "http://localhost:5173", // deine Vite-Frontend-URL
+    methods: ["GET", "POST"],
+    credentials: true, // falls Cookies/Sessions verwendet werden
+}));
+
 app.use(express.json());
 
 const server = http.createServer(app);
