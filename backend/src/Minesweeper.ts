@@ -219,6 +219,19 @@ export class MinesweeperGame {
         this.hintsUsed++;
     }
 
+    public resetGame(seed: number): void {
+        this.board = new Array(this.width * this.height).fill(null).map(() => ({
+            revealed: false,
+            flagged: false,
+            value: 0,
+            lastInteractedBy: null
+        }));
+        this.hintsUsed = 0;
+        this.startTime = 0;
+        this.status = GameStatus.NotReady;
+        this.generateBoard(seed)
+    }
+
     private idx(x: number, y: number) {
         return y * this.width + x;
     }
