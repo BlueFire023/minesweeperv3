@@ -1,5 +1,5 @@
 import { Room, Client } from "colyseus";
-import { MinesweeperGame, GameStatus } from "./Minesweeper";
+import { MinesweeperGame } from "./Minesweeper";
 
 export class MinesweeperRoom extends Room<MinesweeperGame> {
 
