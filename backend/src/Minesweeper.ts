@@ -7,13 +7,22 @@ const neighborPositions = [
     [-1,  1], [0,  1], [1,  1]
 ];
 
+export enum GameStatus {
+    NotReady,
+    Ready,
+    Running,
+    Won,
+    Lost
+}
+
 export class MinesweeperGame {
-    board: CellData[]
-    width: number
-    height: number
-    mineCount: number
+    board: CellData[];
+    width: number;
+    height: number;
+    mineCount: number;
     hintsUsed: number = 0;
     startTime: number = 0;
+    status: GameStatus = GameStatus.NotReady;
 
     constructor(width: number, height: number, mineCount: number) {
         this.width = width;
@@ -92,6 +101,7 @@ export class MinesweeperGame {
             let startCell = startCellCandidates[Math.floor(rng() * startCellCandidates.length)];
             this.board[this.idx(startCell.x, startCell.y)].isStartingCell = true;
         }
+        this.status = GameStatus.Ready;
     }
 
     // reveal cell. Flood fill if value is 0
@@ -159,6 +169,7 @@ export class MinesweeperGame {
 
     startTimer(): void {
         this.startTime = Date.now();
+        this.status = GameStatus.Running;
     }
 
     /*
