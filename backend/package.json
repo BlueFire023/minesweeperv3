@@ -14,9 +14,14 @@
     "@colyseus/schema": "^3.0.70",
     "@colyseus/ws-transport": "^0.16.5",
     "colyseus": "^0.16.5",
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "seedrandom": "^3.0.5"
   },
   "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/seedrandom": "^3.0.8",
+    "jest": "^30.2.0",
+    "ts-jest": "^29.4.6",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.9.3"
   }
