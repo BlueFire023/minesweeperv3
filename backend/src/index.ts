@@ -1,8 +1,8 @@
 import express from "express";
 import http from "http";
-import { Server } from "colyseus";
-import { matchMaker } from "@colyseus/core";
-import { MinesweeperRoom } from "./Room";
+import {Server} from "colyseus";
+import {matchMaker} from "@colyseus/core";
+import {MinesweeperRoom} from "./Room";
 import cors from "cors"
 
 const app = express();
@@ -16,16 +16,16 @@ app.use(cors({
 app.use(express.json());
 
 const server = http.createServer(app);
-const gameServer = new Server({ server });
+const gameServer = new Server();
 
 // --- Colyseus-Raum definieren ---
-gameServer.define("minesweeper", MinesweeperRoom, { maxClients: 4 });
+gameServer.define("minesweeper", MinesweeperRoom);
 
 // --- HTTP Endpoints ---
 
 // Health check
 app.get("/health", (_req, res) => {
-    res.json({ status: "ok" });
+    res.json({status: "ok"});
 });
 
 // Liste aller Räume
@@ -33,29 +33,29 @@ app.get("/health", (_req, res) => {
 app.get("/getRooms", async (_req, res) => {
     try {
         // Räume vom Typ "minesweeper" abrufen
-        const rooms = await matchMaker.query({ name: "minesweeper" });
-
+        const rooms = await matchMaker.query({name: "minesweeper"});
         // Relevante Infos extrahieren
-        const roomList = rooms.map(room => ({
-            id: room.roomId,
-            clients: room.clients,
-            maxClients: room.maxClients,
-            metadata: room.metadata
-        }));
+        const roomList = rooms.map(room => {
+            return {
+                id: room.roomId,
+                players: room.clients,
+                metadata: room.metadata
+            }
+        });
 
         res.json(roomList);
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: "Could not fetch rooms" });
+        res.status(500).json({error: "Could not fetch rooms"});
     }
 });
 
 // Eigenen Raum erstellen
 app.post("/createRoom", async (req, res) => {
-    const { width, height, mineCount, seed, playerId } = req.body;
+    const {width, height, mineCount, seed} = req.body;
 
     if (!width || !height || !mineCount) {
-        return res.status(400).json({ error: "width, height and mineCount are required" });
+        return res.status(400).json({error: "width, height and mineCount are required"});
     }
 
     try {
@@ -64,12 +64,11 @@ app.post("/createRoom", async (req, res) => {
             height,
             mineCount,
             seed: seed ?? Date.now(),
-            playerId
         });
 
-        res.json({ roomId: room.roomId });
+        res.json({roomId: room.roomId});
     } catch (err: any) {
-        res.status(500).json({ error: err.message });
+        res.status(500).json({error: err.message});
     }
 });
 

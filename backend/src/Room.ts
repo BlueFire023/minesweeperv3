@@ -1,10 +1,11 @@
-import { Room, Client } from "colyseus";
-import { MinesweeperGame } from "./Minesweeper";
+import {Room, Client} from "colyseus";
+import {MinesweeperGame} from "./Minesweeper";
 
 export class MinesweeperRoom extends Room<MinesweeperGame> {
 
     onCreate(options: any) {
         console.log("Minesweeper Room created", options);
+        this.setMetadata(options);
 
         // initialer Seed oder per Options
         const seed = options.seed ?? Date.now();
@@ -27,7 +28,7 @@ export class MinesweeperRoom extends Room<MinesweeperGame> {
         this.onMessage("newGame", (client, message: { seed?: number }) => {
             const newSeed = message.seed ?? Date.now();
             this.state.resetGame(newSeed);
-            this.broadcast("newGameStarted", { seed: newSeed });
+            this.broadcast("newGameStarted", {seed: newSeed});
         });
     }
 
