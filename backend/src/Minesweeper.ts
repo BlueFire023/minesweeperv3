@@ -1,6 +1,12 @@
 import seedrandom from "seedrandom";
 import { CellData } from "./Types";
 
+const neighborPositions = [
+    [-1, -1], [0, -1], [1, -1],
+    [-1,  0],          [1,  0],
+    [-1,  1], [0,  1], [1,  1]
+];
+
 export class MinesweeperGame {
     board:  CellData[]
     width: number
@@ -15,7 +21,7 @@ export class MinesweeperGame {
             revealed: false,
             flagged: false,
             value: 0,
-            revealedBy: null
+            lastInteractedBy: null
         }));
     }
 
@@ -46,13 +52,7 @@ export class MinesweeperGame {
         for (let y = 0; y < this.height; y++) {
             for (let x = 0; x < this.width; x++) {
                 if (this.board[this.idx(x,y)].value === -1) {
-                    const directions = [
-                        [-1, -1], [0, -1], [1, -1],
-                        [-1,  0],          [1,  0],
-                        [-1,  1], [0,  1], [1,  1]
-                    ];
-
-                    for (const [dx, dy] of directions) {
+                    for (const [dx, dy] of neighborPositions) {
                         const newX = x + dx;
                         const newY = y + dy;
                         if (newX >= 0 && newY >= 0 && newX < this.width && newY < this.height) {
@@ -73,6 +73,7 @@ export class MinesweeperGame {
                 }
             }
         }
+
         //pick a random cell with the value 0
         if (startCellCandidates.length === 0) {
             console.log('No cells with value 0')
@@ -91,8 +92,34 @@ export class MinesweeperGame {
         }
     }
 
-    revealCell(x: number, y: number): void {
-        // Implementation for revealing a cell
+    // reveal cell. Flood fill if value is 0
+    revealCell(x: number, y: number, playerId: string ): void {
+        if(x < 0 || y < 0 || x >= this.width || y >= this.height) return;
+        const cell = this.board[this.idx(x, y)];
+        if (cell.revealed || cell.flagged) return;
+        
+        const stack: [number, number][] = [[x, y]];
+        const visited = new Set<string>();
+
+        while (stack.length > 0) {
+            const [cx, cy] = stack.pop()!;
+            const key = `${cx},${cy}`;
+            if (visited.has(key)) continue;
+            visited.add(key);
+
+            if (cx < 0 || cy < 0 || cx >= this.width || cy >= this.height) continue;
+            const cell = this.board[this.idx(cx, cy)];
+            if (cell.revealed) continue;
+
+            cell.revealed = true;
+            cell.lastInteractedBy = playerId;
+
+            if (cell.value === 0) {
+                for (const [dx, dy] of neighborPositions) {
+                    stack.push([cx + dx, cy + dy]);
+                }
+            }
+        }
     }
 
     flagCell(x: number, y: number): void {
@@ -107,7 +134,9 @@ export class MinesweeperGame {
         for (let y = 0; y < this.height; y++) {
             for (let x = 0; x < this.width; x++) {
                 const cell = this.board[this.idx(x,y)];
-                if (cell.value === -1) {
+                if(cell.isStartingCell) {
+                    output += "[S]";
+                } else if (cell.value === -1) {
                     output += " * ";
                 } else {
                     output += ` ${cell.value} `;
