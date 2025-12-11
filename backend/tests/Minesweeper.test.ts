@@ -58,9 +58,28 @@ describe("MinesweeperGame", () => {
         expect(cell.lastInteractedBy).toBe(null);
     });
 
+    it("use a hint", () => {
+        const game = new MinesweeperGame(5, 5, 5);
+        game.generateBoard(1);
+
+        expect(game.hintsUsed).toBe(0);
+
+        game.useHint(2,0,"player1");
+        let cell = game.board[game.idx(2,0)];
+        expect(cell.flagged).toBe(true);
+        expect(cell.lastInteractedBy).toBe("player1");
+        expect(game.hintsUsed).toBe(1);
+
+        game.useHint(1,0,"player1");
+        cell = game.board[game.idx(1,0)];
+        expect(cell.revealed).toBe(true);
+        expect(cell.lastInteractedBy).toBe("player1");
+        expect(game.hintsUsed).toBe(2);
+    })
+
     it("print board for debugging", () => {
-        const game = new MinesweeperGame(10, 10, 50);
-        game.generateBoard(12345);
+        const game = new MinesweeperGame(5, 5, 5);
+        game.generateBoard(1);
         console.log(game.getBoardString());
     });
 
