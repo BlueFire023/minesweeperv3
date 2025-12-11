@@ -223,6 +223,7 @@ export class MinesweeperGame {
     }
 
     startTimer(): void {
+        if (this.status === GameStatus.Running) return;
         this.startTime = Date.now();
         this.status = GameStatus.Running;
     }
