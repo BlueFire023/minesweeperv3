@@ -138,6 +138,23 @@ export class MinesweeperGame {
         }
     }
 
+    useHint(x: number, y: number, playerId: string): void {
+        if(x < 0 || y < 0 || x >= this.width || y >= this.height) return;
+        const cell = this.board[this.idx(x, y)];
+        if(cell.flagged || cell.revealed) {
+            return;
+        }
+
+        if(!cell.revealed) {
+            if(cell.value !== -1) {
+                this.revealCell(x, y, playerId);
+                return;
+            } else {
+                this.flagCell(x, y, playerId);
+            }
+        }
+    }
+
     /*
      *  Debug
      */
