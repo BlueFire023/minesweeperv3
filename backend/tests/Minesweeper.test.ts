@@ -44,6 +44,20 @@ describe("MinesweeperGame", () => {
         expect(cell.lastInteractedBy).toBe("player1");
     });
 
+    it("flagging a cell toggles its flagged state", () => {
+        const game = new MinesweeperGame(5, 5, 0);
+        game.generateBoard(1);
+
+        game.flagCell(1,1, "player1");
+        const cell = game.board[game.idx(1,1)];
+        expect(cell.flagged).toBe(true);
+        expect(cell.lastInteractedBy).toBe("player1");
+
+        game.flagCell(1,1, "player1");
+        expect(cell.flagged).toBe(false);
+        expect(cell.lastInteractedBy).toBe(null);
+    });
+
     it("print board for debugging", () => {
         const game = new MinesweeperGame(10, 10, 50);
         game.generateBoard(12345);
