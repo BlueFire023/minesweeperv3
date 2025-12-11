@@ -1,11 +1,13 @@
 import seedrandom from "seedrandom";
 import {CellData} from "./Types";
 
+// @formatter:off
 const neighborPositions = [
     [-1, -1], [0, -1], [1, -1],
-    [-1, 0], [1, 0],
-    [-1, 1], [0, 1], [1, 1]
+    [-1,  0],          [1,  0],
+    [-1,  1], [0,  1], [1,  1]
 ];
+// @formatter:on
 
 export enum GameStatus {
     NotReady,
@@ -122,6 +124,7 @@ export class MinesweeperGame {
             this.handleFloodFill(x, y, playerId);
         } else {
             let proximityFlags = 0;
+            let validNeighborPositions: { x: number, y: number }[] = [];
             for (const [dx, dy] of neighborPositions) {
                 const newX = x + dx;
                 const newY = y + dy;
@@ -130,23 +133,21 @@ export class MinesweeperGame {
                     if (neighbor.flagged) {
                         proximityFlags++;
                     }
+                    validNeighborPositions.push({x: newX, y: newY});
                 }
             }
             if (proximityFlags === proximityBombs) {
-                for (const [dx, dy] of neighborPositions) {
-                    const newX = x + dx;
-                    const newY = y + dy;
-                    if (newX >= 0 && newY >= 0 && newX < this.width && newY < this.height) {
-                        const neighbor = this.board[this.idx(newX, newY)];
-                        if (!neighbor.revealed && !neighbor.flagged) {
-                            if (neighbor.value === -1) {
-                                this.handleMineHit(neighbor, playerId);
-                            } else if (neighbor.value === 0) {
-                                this.handleFloodFill(newX, newY, playerId);
-                            } else {
-                                neighbor.revealed = true;
-                                neighbor.lastInteractedBy = playerId;
-                            }
+                for (const pos of validNeighborPositions) {
+                    const neighbor = this.board[this.idx(pos.x, pos.y)];
+                    if (!neighbor.revealed && !neighbor.flagged) {
+                        if (neighbor.value === -1) {
+                            this.handleMineHit(neighbor, playerId);
+                            return;
+                        } else if (neighbor.value === 0) {
+                            this.handleFloodFill(pos.x, pos.y, playerId);
+                        } else {
+                            neighbor.revealed = true;
+                            neighbor.lastInteractedBy = playerId;
                         }
                     }
                 }
@@ -180,6 +181,9 @@ export class MinesweeperGame {
             cell.lastInteractedBy = playerId;
 
             if (cell.value === 0) {
+                if (cell.isStartingCell) {
+                    cell.isStartingCell = false;
+                }
                 for (const [dx, dy] of neighborPositions) {
                     stack.push([cx + dx, cy + dy]);
                 }
@@ -239,9 +243,10 @@ export class MinesweeperGame {
                 } else {
                     output += ` ${cell.value}`;
                 }
-                if(cell.flagged){
+                if (cell.flagged) {
                     output += "f";
-                }else {
+                }
+                if (!cell.flagged) {
                     output += cell.revealed ? "r" : " ";
                 }
             }
