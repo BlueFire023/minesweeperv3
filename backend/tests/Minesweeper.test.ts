@@ -8,6 +8,7 @@ describe("MinesweeperGame", () => {
 
         const mineCount = game.board.filter(cell => cell.value === -1).length;
         expect(mineCount).toBe(10);
+        console.log(game.getBoardString());
     });
 
     it("calculates neighbor numbers correctly", () => {
@@ -21,7 +22,7 @@ describe("MinesweeperGame", () => {
 
         const neighbors = [
             [x-1, y-1], [x, y-1], [x+1, y-1],
-            [x-1, y],             [x+1, y],
+            [x-1, y  ],           [x+1, y  ],
             [x-1, y+1], [x, y+1], [x+1, y+1]
         ];
 
@@ -31,14 +32,17 @@ describe("MinesweeperGame", () => {
                 if (cell.value !== -1) expect(cell.value).toBeGreaterThan(0);
             }
         });
+        console.log(game.getBoardString());
     });
 
     it("revealing a cell marks it as revealed and tracks client", () => {
-        const game = new MinesweeperGame(5, 5, 0);
-        game.generateBoard(1);
+        const game = new MinesweeperGame(10, 10, 2);
+        game.generateBoard(4);
+        console.log(game.getBoardString());
 
         game.revealCell(2, 3, "player1");
         const cell = game.board[game.idx(2,3)];
+        console.log(game.getBoardString());
 
         expect(cell.revealed).toBe(true);
         expect(cell.lastInteractedBy).toBe("player1");
@@ -46,35 +50,56 @@ describe("MinesweeperGame", () => {
 
     it("flagging a cell toggles its flagged state", () => {
         const game = new MinesweeperGame(5, 5, 0);
-        game.generateBoard(1);
+        game.generateBoard(2);
+        console.log(game.getBoardString());
 
         game.flagCell(1,1, "player1");
         const cell = game.board[game.idx(1,1)];
         expect(cell.flagged).toBe(true);
         expect(cell.lastInteractedBy).toBe("player1");
+        console.log(game.getBoardString());
 
         game.flagCell(1,1, "player1");
         expect(cell.flagged).toBe(false);
         expect(cell.lastInteractedBy).toBe(null);
+        console.log(game.getBoardString());
     });
 
     it("use a hint", () => {
         const game = new MinesweeperGame(5, 5, 5);
         game.generateBoard(1);
+        console.log(game.getBoardString());
 
         expect(game.hintsUsed).toBe(0);
 
         game.useHint(2,0,"player1");
+        console.log(game.getBoardString());
+
         let cell = game.board[game.idx(2,0)];
         expect(cell.flagged).toBe(true);
         expect(cell.lastInteractedBy).toBe("player1");
         expect(game.hintsUsed).toBe(1);
 
         game.useHint(1,0,"player1");
+        console.log(game.getBoardString());
+
         cell = game.board[game.idx(1,0)];
         expect(cell.revealed).toBe(true);
         expect(cell.lastInteractedBy).toBe("player1");
         expect(game.hintsUsed).toBe(2);
+
+    })
+
+    it("reveal neighboring cells when revealing a non zero cell with the correct flag in place", () => {
+        const game = new MinesweeperGame(5, 5, 4);
+        game.generateBoard(10);
+        console.log(game.getBoardString());
+
+        game.flagCell(0,2, "player1");
+        console.log(game.getBoardString());
+
+        game.revealCell(1,2, "player1");
+        console.log(game.getBoardString());
     })
 
     it("print board for debugging", () => {

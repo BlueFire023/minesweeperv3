@@ -3,8 +3,8 @@ import {CellData} from "./Types";
 
 const neighborPositions = [
     [-1, -1], [0, -1], [1, -1],
-    [-1,  0],          [1,  0],
-    [-1,  1], [0,  1], [1,  1]
+    [-1, 0], [1, 0],
+    [-1, 1], [0, 1], [1, 1]
 ];
 
 export enum GameStatus {
@@ -107,11 +107,62 @@ export class MinesweeperGame {
     // reveal cell. Flood fill if value is 0
     revealCell(x: number, y: number, playerId: string): void {
         if (x < 0 || y < 0 || x >= this.width || y >= this.height) return;
-        const cell = this.board[this.idx(x, y)];
-        if (cell.revealed || cell.flagged) return;
+        const cell = this.board[this.idx(x, y)]
+        if (cell.flagged) return;
 
         this.startTimer();
 
+        if (!cell.revealed && cell.value === -1) {
+            this.handleMineHit(cell, playerId);
+            return;
+        }
+
+        let proximityBombs = cell.value;
+        if (proximityBombs === 0) {
+            this.handleFloodFill(x, y, playerId);
+        } else {
+            let proximityFlags = 0;
+            for (const [dx, dy] of neighborPositions) {
+                const newX = x + dx;
+                const newY = y + dy;
+                if (newX >= 0 && newY >= 0 && newX < this.width && newY < this.height) {
+                    const neighbor = this.board[this.idx(newX, newY)];
+                    if (neighbor.flagged) {
+                        proximityFlags++;
+                    }
+                }
+            }
+            if (proximityFlags === proximityBombs) {
+                for (const [dx, dy] of neighborPositions) {
+                    const newX = x + dx;
+                    const newY = y + dy;
+                    if (newX >= 0 && newY >= 0 && newX < this.width && newY < this.height) {
+                        const neighbor = this.board[this.idx(newX, newY)];
+                        if (!neighbor.revealed && !neighbor.flagged) {
+                            if (neighbor.value === -1) {
+                                this.handleMineHit(neighbor, playerId);
+                            } else if (neighbor.value === 0) {
+                                this.handleFloodFill(newX, newY, playerId);
+                            } else {
+                                neighbor.revealed = true;
+                                neighbor.lastInteractedBy = playerId;
+                            }
+                        }
+                    }
+                }
+            } else {
+                this.handleFloodFill(x, y, playerId);
+            }
+        }
+    }
+
+    handleMineHit(cell: CellData, playerId: string): void {
+        cell.revealed = true;
+        cell.lastInteractedBy = playerId;
+        this.status = GameStatus.Lost;
+    }
+
+    handleFloodFill(x: number, y: number, playerId: string): void {
         const stack: [number, number][] = [[x, y]];
         const visited = new Set<string>();
 
@@ -181,11 +232,17 @@ export class MinesweeperGame {
             for (let x = 0; x < this.width; x++) {
                 const cell = this.board[this.idx(x, y)];
                 if (cell.isStartingCell) {
-                    output += "[S]";
+                    output += " S";
+
                 } else if (cell.value === -1) {
-                    output += " * ";
+                    output += " *";
                 } else {
-                    output += ` ${cell.value} `;
+                    output += ` ${cell.value}`;
+                }
+                if(cell.flagged){
+                    output += "f";
+                }else {
+                    output += cell.revealed ? "r" : " ";
                 }
             }
             output += "\n";
