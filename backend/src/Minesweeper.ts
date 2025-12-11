@@ -1,0 +1,121 @@
+import seedrandom from "seedrandom";
+import { CellData } from "./Types";
+
+export class MinesweeperGame {
+    board:  CellData[]
+    width: number
+    height: number
+    mineCount: number
+
+    constructor(width: number, height: number, mineCount: number) {
+        this.width = width;
+        this.height = height;
+        this.mineCount = mineCount;
+        this.board = new Array(width * height).fill(null).map(() => ({
+            revealed: false,
+            flagged: false,
+            value: 0,
+            revealedBy: null
+        }));
+    }
+
+    idx(x: number, y: number) {
+        return y * this.width + x;
+    }
+
+    generateBoard(seed: number): void {
+        const rng = seedrandom(seed.toString());
+
+        if (this.mineCount > this.width * this.height) throw new Error("Too many mines");
+        // Place mines
+        for (let i = 0; i < this.mineCount; i++) {
+            while (true) {
+                let x = Math.floor(rng() * this.width);
+                let y = Math.floor(rng() * this.height);
+
+                if (this.board[this.idx(x,y)].value === -1) {
+                    continue;
+                }
+
+                this.board[this.idx(x,y)].value = -1;
+                break;
+            }
+        }
+
+        // Calculate mine counts
+        for (let y = 0; y < this.height; y++) {
+            for (let x = 0; x < this.width; x++) {
+                if (this.board[this.idx(x,y)].value === -1) {
+                    const directions = [
+                        [-1, -1], [0, -1], [1, -1],
+                        [-1,  0],          [1,  0],
+                        [-1,  1], [0,  1], [1,  1]
+                    ];
+
+                    for (const [dx, dy] of directions) {
+                        const newX = x + dx;
+                        const newY = y + dy;
+                        if (newX >= 0 && newY >= 0 && newX < this.width && newY < this.height) {
+                            const neighbor = this.board[this.idx(newX, newY)];
+                            if (neighbor.value !== -1) neighbor.value++;
+                        }
+                    }
+                }
+            }
+        }
+
+        //find the cells with the value 0
+        let startCellCandidates = []
+        for (let y = 0; y < this.height; y++) {
+            for (let x = 0; x < this.width; x++) {
+                if (this.board[this.idx(x,y)].value === 0) {
+                    startCellCandidates.push({x: x, y: y});
+                }
+            }
+        }
+        //pick a random cell with the value 0
+        if (startCellCandidates.length === 0) {
+            console.log('No cells with value 0')
+            while (true) {
+                let x = Math.floor(rng() * this.width);
+                let y = Math.floor(rng() * this.height);
+
+                if (this.board[this.idx(x,y)].value !== -1) {
+                    this.board[this.idx(x,y)].isStartingCell = true;
+                    break;
+                }
+            }
+        } else {
+            let startCell = startCellCandidates[Math.floor(rng() * startCellCandidates.length)];
+            this.board[this.idx(startCell.x,startCell.y)].isStartingCell = true;
+        }
+    }
+
+    revealCell(x: number, y: number): void {
+        // Implementation for revealing a cell
+    }
+
+    flagCell(x: number, y: number): void {
+        // Implementation for flagging a cell
+    }
+
+    /*
+     *  Debug
+     */
+    getBoardString(): string {
+        let output = "";
+        for (let y = 0; y < this.height; y++) {
+            for (let x = 0; x < this.width; x++) {
+                const cell = this.board[this.idx(x,y)];
+                if (cell.value === -1) {
+                    output += " * ";
+                } else {
+                    output += ` ${cell.value} `;
+                }
+            }
+            output += "\n";
+        }
+        return output;
+    }
+
+}
