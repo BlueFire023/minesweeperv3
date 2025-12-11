@@ -33,6 +33,17 @@ describe("MinesweeperGame", () => {
         });
     });
 
+    it("revealing a cell marks it as revealed and tracks client", () => {
+        const game = new MinesweeperGame(5, 5, 0);
+        game.generateBoard(1);
+
+        game.revealCell(2, 3, "player1");
+        const cell = game.board[game.idx(2,3)];
+
+        expect(cell.revealed).toBe(true);
+        expect(cell.lastInteractedBy).toBe("player1");
+    });
+
     it("print board for debugging", () => {
         const game = new MinesweeperGame(10, 10, 50);
         game.generateBoard(12345);
