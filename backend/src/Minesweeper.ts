@@ -122,8 +122,20 @@ export class MinesweeperGame {
         }
     }
 
-    flagCell(x: number, y: number): void {
-        // Implementation for flagging a cell
+    flagCell(x: number, y: number, playerId: string): void {
+        if(x < 0 || y < 0 || x >= this.width || y >= this.height) return;
+        const cell = this.board[this.idx(x, y)];
+        if (cell.revealed) return;
+
+        if(cell.flagged){
+            cell.flagged = false;
+            cell.lastInteractedBy = null;
+            return;
+        } else {
+            cell.flagged = true;
+            cell.lastInteractedBy = playerId;
+            return;
+        }
     }
 
     /*
