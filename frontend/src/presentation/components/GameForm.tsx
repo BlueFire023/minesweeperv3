@@ -3,16 +3,19 @@ import {Button} from "./Button";
 import {TextField} from "./TextField";
 import {useState} from "react";
 import {client} from "../../client/Client";
+import {useNavigate} from "@tanstack/react-router";
 
 export function GameForm() {
     const [rows, setRows] = useState(10);
     const [columns, setColumns] = useState(10);
     const [minePercentage, setMinePercentage] = useState(15);
     const [name, setName] = useState("");
+    const navigate = useNavigate();
 
     async function createNewGame(width: number, height: number, minePercentage: number) {
         try {
             const gameRoom = await client.create("minesweeper", {width, height, minePercentage, name});
+            navigate({ to: `/${gameRoom.roomId}` });
             console.log("Neuer Raum erstellt:", gameRoom.roomId);
         } catch (err) {
             console.error("Fehler beim Erstellen des Spiels:", err);
