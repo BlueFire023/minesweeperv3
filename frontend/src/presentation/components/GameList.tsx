@@ -1,16 +1,20 @@
 import { type RoomAvailable } from "colyseus.js";
 import React from "react";
+import {useNavigate} from "@tanstack/react-router";
 
 interface GameListProps {
     rooms: RoomAvailable[];
-    onJoin?: (roomId: string) => void;
 }
 
 export const GameList: React.FC<GameListProps> = ({ rooms }) => {
     const [expandedGame, setExpandedGame] = React.useState<string | null>(null);
+    const navigate = useNavigate();
     const connected = true; // Replace with actual connection status
 
-    const handleJoinGame = (roomId: string) => {}
+    const handleJoin = (roomId: string) => {
+        console.log("Join Room", roomId);
+        navigate({ to: `/${roomId}` });
+    };
 
     return (
         <div className="flex flex-col items-center w-full sm:w-96 bg-gray-700 shadow-lg rounded-md justify-end">
@@ -29,7 +33,7 @@ export const GameList: React.FC<GameListProps> = ({ rooms }) => {
                                         <p className="text-left">Size: {room.metadata.width}x{room.metadata.height}</p> {/* Display the X and Y size */}
                                         <p className="text-left">Mines: {room.metadata.minePercentage}%</p> {/* Display the amount of mines */}
                                     </div>
-                                    <button className="bg-blue-500 text-white px-4 py-2 rounded" onClick={() => handleJoinGame(room.roomId)}>Join
+                                    <button className="bg-blue-500 text-white px-4 py-2 rounded" onClick={() => handleJoin(room.roomId)}>Join
                                     </button>
                                 </div>
                             )}

@@ -10,11 +10,17 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as GameSelectRouteImport } from './routes/game-select'
+import { Route as RoomIdRouteImport } from './routes/$roomId'
 import { Route as IndexRouteImport } from './routes/index'
 
 const GameSelectRoute = GameSelectRouteImport.update({
   id: '/game-select',
   path: '/game-select',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RoomIdRoute = RoomIdRouteImport.update({
+  id: '/$roomId',
+  path: '/$roomId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -25,27 +31,31 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/$roomId': typeof RoomIdRoute
   '/game-select': typeof GameSelectRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/$roomId': typeof RoomIdRoute
   '/game-select': typeof GameSelectRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/$roomId': typeof RoomIdRoute
   '/game-select': typeof GameSelectRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/game-select'
+  fullPaths: '/' | '/$roomId' | '/game-select'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/game-select'
-  id: '__root__' | '/' | '/game-select'
+  to: '/' | '/$roomId' | '/game-select'
+  id: '__root__' | '/' | '/$roomId' | '/game-select'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  RoomIdRoute: typeof RoomIdRoute
   GameSelectRoute: typeof GameSelectRoute
 }
 
@@ -56,6 +66,13 @@ declare module '@tanstack/react-router' {
       path: '/game-select'
       fullPath: '/game-select'
       preLoaderRoute: typeof GameSelectRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$roomId': {
+      id: '/$roomId'
+      path: '/$roomId'
+      fullPath: '/$roomId'
+      preLoaderRoute: typeof RoomIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -70,6 +87,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  RoomIdRoute: RoomIdRoute,
   GameSelectRoute: GameSelectRoute,
 }
 export const routeTree = rootRouteImport
