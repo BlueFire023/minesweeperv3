@@ -5,8 +5,7 @@ import {useLobby} from "../hooks/useLobby";
 export const GameList = () => {
     const [expandedGame, setExpandedGame] = React.useState<string | null>(null);
     const navigate = useNavigate();
-    const connected = true; // Replace with actual connection status
-    const {rooms,joinRoom} = useLobby();
+    const {rooms, error, joinRoom} = useLobby();
 
     const handleJoin = (roomId: string) => {
         console.log("Join Room", roomId);
@@ -38,10 +37,10 @@ export const GameList = () => {
                             )}
                         </li>
                     ))}
-                    {connected && rooms.length === 0 &&
+                    {error && rooms.length === 0 &&
                         <div className="flex items-center bg-gray-500 justify-center text-white px-4 py-2 rounded">No
                             games available</div>}
-                    {!connected &&
+                    {!error &&
                         <div className="flex items-center bg-red-500 justify-center text-white px-4 py-2 rounded">No
                             connection to the server</div>}
                 </ul>
