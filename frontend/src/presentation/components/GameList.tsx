@@ -37,10 +37,10 @@ export const GameList = () => {
                             )}
                         </li>
                     ))}
-                    {error && rooms.length === 0 &&
+                    {!error && rooms.length === 0 &&
                         <div className="flex items-center bg-gray-500 justify-center text-white px-4 py-2 rounded">No
                             games available</div>}
-                    {!error &&
+                    {error &&
                         <div className="flex items-center bg-red-500 justify-center text-white px-4 py-2 rounded">No
                             connection to the server</div>}
                 </ul>

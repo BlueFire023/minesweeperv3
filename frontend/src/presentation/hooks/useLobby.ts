@@ -5,7 +5,7 @@ import { client } from "../../client/Client";
 
 export function useLobby() {
     const [rooms, setRooms] = useState<RoomAvailable[]>([]);
-    const [error, setError] = useState<string | null>(null);
+    const [error, setError] = useState<boolean>(false);
     const [lobbyRoom, setLobbyRoom] = useState<Room | null>(null);
 
     useEffect(() => {
@@ -42,7 +42,7 @@ export function useLobby() {
 
             } catch (err) {
                 console.error("Fehler beim Beitreten zur Lobby:", err);
-                setError("Verbindung zur Lobby fehlgeschlagen.");
+                setError(true);
             }
         };
 
