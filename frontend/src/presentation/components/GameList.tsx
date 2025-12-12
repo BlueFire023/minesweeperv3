@@ -27,7 +27,7 @@ export const GameList: React.FC<GameListProps> = ({ rooms }) => {
                                     <div>
                                         <p className="text-left">ID: {room.roomId}</p> {/* Replace with actual game description */}
                                         <p className="text-left">Size: {room.metadata.width}x{room.metadata.height}</p> {/* Display the X and Y size */}
-                                        <p className="text-left">Mines: {room.metadata.mineCount}%</p> {/* Display the amount of mines */}
+                                        <p className="text-left">Mines: {room.metadata.minePercentage}%</p> {/* Display the amount of mines */}
                                     </div>
                                     <button className="bg-blue-500 text-white px-4 py-2 rounded" onClick={() => handleJoinGame(room.roomId)}>Join
                                     </button>
@@ -36,9 +36,9 @@ export const GameList: React.FC<GameListProps> = ({ rooms }) => {
                         </li>
                     ))}
                     {connected && rooms.length === 0 &&
-                        <div className="flex items-center no-games">No games available</div>}
+                        <div className="flex items-center bg-gray-500 justify-center text-white px-4 py-2 rounded">No games available</div>}
                     {!connected &&
-                        <div className="flex items-center no-connection">No connection to the server</div>}
+                        <div className="flex items-center bg-red-500 justify-center text-white px-4 py-2 rounded">No connection to the server</div>}
                 </ul>
             </div>
         </div>
