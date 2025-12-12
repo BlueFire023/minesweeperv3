@@ -7,7 +7,7 @@ export class MinesweeperRoom extends Room<MinesweeperGame> {
 
     onCreate(options: any) {
         console.log("Minesweeper Room created", options);
-        if(options.name === "" || options.name === undefined) {
+        if (options.name === "" || options.name === undefined) {
             options.name = `Game ${autoGameCounter++}`;
         }
         this.setMetadata(options);
@@ -44,6 +44,13 @@ export class MinesweeperRoom extends Room<MinesweeperGame> {
 
     onLeave(client: Client, consented: boolean) {
         console.log(client.sessionId, "left the room");
+        this.allowReconnection(client, 10)
+            .then(() => {
+                console.log(client.sessionId, "reconnected to the room");
+            })
+            .catch(() => {
+                console.log(client.sessionId, "failed to reconnect");
+            });
     }
 
     onDispose() {
