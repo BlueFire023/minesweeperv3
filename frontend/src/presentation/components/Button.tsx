@@ -30,6 +30,7 @@ export const Button = ({
         <button
             type="button"
             className={clsx(baseStyle, variants[type], customStyle)}
+            onClick={props.onClick}
             {...props}
         >
             {label}

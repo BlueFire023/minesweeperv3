@@ -1,9 +1,8 @@
-import {useState} from "react";
-
 type InputFieldProps = {
     label: string;
     id: string;
-    numberValue?: number;
+    value: number;
+    onChange: (value: number) => void;
     rangeMin?: number;
     rangeMax?: number;
     suffix?: string;
@@ -12,12 +11,12 @@ type InputFieldProps = {
 export function InputField({
                                label,
                                id,
-                               numberValue,
+                               value,
+                               onChange,
                                rangeMin,
                                rangeMax,
                                suffix = "",
                            }: InputFieldProps) {
-    const [val, setVal] = useState(numberValue);
 
     return (
         <div className="flex flex-col items-center">
@@ -27,13 +26,11 @@ export function InputField({
                     <input
                         id={id}
                         type="number"
-                        value={val}
-                        onChange={(e) => setVal(Number(e.target.value))}
+                        value={value}
+                        onChange={(e) => onChange(Number(e.target.value))}
                         className="bg-transparent w-1/12 outline-none ml-2 appearance-none"
                     />
-                    {suffix && (
-                        <span>{suffix}</span>
-                    )}
+                    {suffix && <span>{suffix}</span>}
                 </label>
             </div>
 
@@ -43,8 +40,8 @@ export function InputField({
                     type="range"
                     min={rangeMin}
                     max={rangeMax}
-                    value={val}
-                    onChange={(e) => setVal(Number(e.target.value))}
+                    value={value}
+                    onChange={(e) => onChange(Number(e.target.value))}
                     className="w-[200px] py-1 px-1 my-2 text-center inline-block border border-gray-300 rounded box-border"
                 />
             )}
