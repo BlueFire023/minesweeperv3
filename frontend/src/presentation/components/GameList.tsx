@@ -1,19 +1,17 @@
-import { type RoomAvailable } from "colyseus.js";
 import React from "react";
 import {useNavigate} from "@tanstack/react-router";
+import {useLobby} from "../hooks/useLobby";
 
-interface GameListProps {
-    rooms: RoomAvailable[];
-}
-
-export const GameList: React.FC<GameListProps> = ({ rooms }) => {
+export const GameList = () => {
     const [expandedGame, setExpandedGame] = React.useState<string | null>(null);
     const navigate = useNavigate();
     const connected = true; // Replace with actual connection status
+    const {rooms,joinRoom} = useLobby();
 
     const handleJoin = (roomId: string) => {
         console.log("Join Room", roomId);
-        navigate({ to: `/${roomId}` });
+        navigate({to: `/${roomId}`});
+        joinRoom(roomId);
     };
 
     return (
@@ -33,16 +31,19 @@ export const GameList: React.FC<GameListProps> = ({ rooms }) => {
                                         <p className="text-left">Size: {room.metadata.width}x{room.metadata.height}</p> {/* Display the X and Y size */}
                                         <p className="text-left">Mines: {room.metadata.minePercentage}%</p> {/* Display the amount of mines */}
                                     </div>
-                                    <button className="bg-blue-500 text-white px-4 py-2 rounded" onClick={() => handleJoin(room.roomId)}>Join
+                                    <button className="bg-blue-500 text-white px-4 py-2 rounded"
+                                            onClick={() => handleJoin(room.roomId)}>Join
                                     </button>
                                 </div>
                             )}
                         </li>
                     ))}
                     {connected && rooms.length === 0 &&
-                        <div className="flex items-center bg-gray-500 justify-center text-white px-4 py-2 rounded">No games available</div>}
+                        <div className="flex items-center bg-gray-500 justify-center text-white px-4 py-2 rounded">No
+                            games available</div>}
                     {!connected &&
-                        <div className="flex items-center bg-red-500 justify-center text-white px-4 py-2 rounded">No connection to the server</div>}
+                        <div className="flex items-center bg-red-500 justify-center text-white px-4 py-2 rounded">No
+                            connection to the server</div>}
                 </ul>
             </div>
         </div>
