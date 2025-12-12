@@ -14,7 +14,7 @@ export class MinesweeperRoom extends Room<MinesweeperGame> {
 
         // initialer Seed oder per Options
         const seed = options.seed ?? Date.now();
-        this.state = new MinesweeperGame(options.width, options.height, options.mineCount);
+        this.state = new MinesweeperGame(options.width, options.height, options.minePercentage, options.name);
         this.state.generateBoard(seed);
 
         // Nachrichten vom Client
