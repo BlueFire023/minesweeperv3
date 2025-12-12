@@ -1,7 +1,6 @@
 import express from "express";
 import http from "http";
 import {Server} from "colyseus";
-import {matchMaker} from "@colyseus/core";
 import {MinesweeperRoom} from "./GameRoom";
 import {LobbyRoom} from "colyseus";
 import cors from "cors"

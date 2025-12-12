@@ -1,10 +1,15 @@
 import {Room, Client} from "colyseus";
 import {MinesweeperGame} from "./Minesweeper";
 
+let autoGameCounter = 1;
+
 export class MinesweeperRoom extends Room<MinesweeperGame> {
 
     onCreate(options: any) {
         console.log("Minesweeper Room created", options);
+        if(options.name === "" || options.name === undefined) {
+            options.name = `Game ${autoGameCounter++}`;
+        }
         this.setMetadata(options);
 
         // initialer Seed oder per Options
@@ -43,5 +48,6 @@ export class MinesweeperRoom extends Room<MinesweeperGame> {
 
     onDispose() {
         console.log("Minesweeper Room disposed");
+        --autoGameCounter;
     }
 }

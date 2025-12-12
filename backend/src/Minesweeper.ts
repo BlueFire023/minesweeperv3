@@ -23,18 +23,22 @@ export class MinesweeperGame extends Schema {
 
     @type("number") width = 0;
     @type("number") height = 0;
+    @type("number") minePercentage = 0;
     @type("number") mineCount = 0;
+    @type("string") name = "";
 
     @type("number") hintsUsed = 0;
     @type("number") startTime = 0;
 
     @type("number") status = GameStatus.NotReady;
 
-    constructor(width: number, height: number, mineCount: number) {
+    constructor(width: number, height: number, minePercentage: number, name: string) {
         super();
         this.width = width;
         this.height = height;
-        this.mineCount = mineCount;
+        this.minePercentage = minePercentage;
+        this.mineCount = Math.floor(width * height * minePercentage / 100);
+        this.name = name;
 
         for (let i = 0; i < width * height; i++) {
             this.board.push(new CellData());
