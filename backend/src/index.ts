@@ -2,7 +2,8 @@ import express from "express";
 import http from "http";
 import {Server} from "colyseus";
 import {matchMaker} from "@colyseus/core";
-import {MinesweeperRoom} from "./Room";
+import {MinesweeperRoom} from "./GameRoom";
+import {LobbyRoom} from "colyseus";
 import cors from "cors"
 
 const app = express();
@@ -18,10 +19,12 @@ app.use(express.json());
 const server = http.createServer(app);
 const gameServer = new Server();
 
-// --- Colyseus-Raum definieren ---
+gameServer
+    .define("lobby", LobbyRoom)
+    .enableRealtimeListing();
+
 gameServer.define("minesweeper", MinesweeperRoom);
 
-// --- HTTP Endpoints ---
 
 // Health check
 app.get("/health", (_req, res) => {
