@@ -19,7 +19,7 @@ export function TextField({
                 id={id}
                 type="Text"
                 onChange={(e) => onChange && onChange(e.target.value)}
-                className="w-[200px] py-1 px-1 my-2 text-center inline-block border bg-gray-100 border-gray-300 rounded box-border"
+                className="w-[200px] py-1 px-1 my-2 text-center inline-block border bg-gray-100 border-gray-300 rounded box-border text-black"
             />
         </div>
     );
