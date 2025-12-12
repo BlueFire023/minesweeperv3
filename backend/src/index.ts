@@ -19,11 +19,14 @@ app.use(express.json());
 const server = http.createServer(app);
 const gameServer = new Server();
 
-gameServer
-    .define("lobby", LobbyRoom)
-    .enableRealtimeListing();
+gameServer.attach({server});
 
-gameServer.define("minesweeper", MinesweeperRoom);
+gameServer
+    .define("lobby", LobbyRoom);
+
+gameServer
+    .define("minesweeper", MinesweeperRoom)
+    .enableRealtimeListing();
 
 
 // Health check
