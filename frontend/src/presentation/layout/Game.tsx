@@ -23,11 +23,6 @@ export function Game() {
             setState({ ...newState });
         };
         activeRoom.onStateChange(listener);
-
-        return () => {
-            activeRoom.removeAllListeners();
-            activeRoom.leave();
-        };
     }, [activeRoom]);
 
     if (!activeRoom) return <div className="text-white">Connecting…</div>;
