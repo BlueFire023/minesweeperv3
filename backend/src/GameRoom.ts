@@ -44,13 +44,16 @@ export class MinesweeperRoom extends Room<MinesweeperGame> {
 
     onLeave(client: Client, consented: boolean) {
         console.log(client.sessionId, "left the room");
-        this.allowReconnection(client, 10)
-            .then(() => {
-                console.log(client.sessionId, "reconnected to the room");
-            })
-            .catch(() => {
-                console.log(client.sessionId, "failed to reconnect");
-            });
+
+        if (!consented) {
+            return this.allowReconnection(client, 10)
+                .then(() => {
+                    console.log(client.sessionId, "reconnected to the room");
+                })
+                .catch(() => {
+                    console.log(client.sessionId, "failed to reconnect");
+                });
+        }
     }
 
     onDispose() {
