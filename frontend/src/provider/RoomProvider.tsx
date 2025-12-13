@@ -1,4 +1,4 @@
-import {createContext, useContext, useEffect, useRef, useState} from "react";
+import {createContext, useContext, useEffect, useState} from "react";
 import {client} from "../client/Client";
 import type {Room, RoomAvailable} from "colyseus.js";
 
@@ -160,6 +160,7 @@ export function RoomProvider({children}: { children: React.ReactNode }) {
     );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useRooms() {
     const ctx = useContext(RoomContext);
     if (!ctx) throw new Error("useRooms must be inside <RoomProvider>");
