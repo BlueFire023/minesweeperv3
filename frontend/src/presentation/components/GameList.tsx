@@ -1,16 +1,16 @@
 import React from "react";
 import {useNavigate} from "@tanstack/react-router";
-import {useLobby} from "../hooks/useLobby";
+import {useRooms} from "../../provider/RoomProvider";
 
 export const GameList = () => {
     const [expandedGame, setExpandedGame] = React.useState<string | null>(null);
     const navigate = useNavigate();
-    const {rooms, error, joinRoom} = useLobby();
+    const {roomsAvailable} = useRooms();
+    const error = false;
 
     const handleJoin = (roomId: string) => {
         console.log("Join Room", roomId);
         navigate({to: `/${roomId}`});
-        joinRoom(roomId);
     };
 
     return (
@@ -18,7 +18,7 @@ export const GameList = () => {
             <h2 className="text-3xl font-bold text-white my-4">Available Games</h2>
             <div className="w-3/4 h-[355px] sm:h-[400px] mb-5 overflow-y-auto">
                 <ul>
-                    {rooms.map((room, index) => (
+                    {roomsAvailable.map((room, index) => (
                         <li className="cursor-pointer py-2 px-4 my-1 w-full text-center bg-gray-200 text-black rounded-md"
                             key={index}
                             onClick={() => setExpandedGame(room.roomId === expandedGame ? null : room.roomId)}>
@@ -37,7 +37,7 @@ export const GameList = () => {
                             )}
                         </li>
                     ))}
-                    {!error && rooms.length === 0 &&
+                    {!error && roomsAvailable.length === 0 &&
                         <div className="flex items-center bg-gray-500 justify-center text-white px-4 py-2 rounded">No
                             games available</div>}
                     {error &&
